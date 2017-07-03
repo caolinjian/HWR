@@ -7,6 +7,8 @@
         </div>
         <canvas width="160" height="160" @mousedown="drawCanvas($event)"></canvas>
         <button @click="clear">clear</button>
+        <button @click="send">send</button>
+        <span>{{result}}</span>
     </div>
 </template>
 
@@ -22,6 +24,7 @@ export default {
     return {
       data: DefaultData,
       writing: false,
+      result: ''
     }
   },
   methods: {
@@ -53,7 +56,6 @@ export default {
           startY = endY;
           return
         }
-        console.log(startX, startY, endX, endY);
         const XLen = Math.abs(endX - startX) + 1;
         const YLen = Math.abs(endY - startY) + 1;
         const rect = [];
@@ -130,7 +132,7 @@ export default {
         context.moveTo(startX, startY);
         context.lineTo(endX, endY);
         context.lineWidth = 3;
-        context.strokeStyle = '#333';
+        context.strokeStyle = '#000';
         context.stroke();
         context.closePath()
         startX = endX;
@@ -150,6 +152,27 @@ export default {
       const canvas = document.querySelector('canvas');
       const context = canvas.getContext('2d');
       context.clearRect(0, 0, 300, 300);
+    },
+    send() {
+      const self = this;
+      window.fetch('/recognition', {
+        method: 'post',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          data: self.data
+        })
+      }).then((res) => {
+        if (res.ok) {
+          return res.json();
+        }
+        throw new Error('Network response was not ok.');
+      }).then((json) => {
+        console.log('---line---', json);
+      }).catch((error) => {
+        console.log(`There has been a problem with your fetch operation:  ${error.message}`);
+      });
     }
   }
 }
