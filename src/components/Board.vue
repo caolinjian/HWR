@@ -33,27 +33,74 @@ export default {
       let startX = parseInt(ev.target.getAttribute('row'), 10);
       let startY = parseInt(ev.target.getAttribute('col'), 10);
 
-    //   function drawline(endX, endY) {
-    //     if (startX == endX) {
-    //       for (let i = startY; i != endY; i += (startY > endY ? -1 : 1)) {
-    //         self.$set(self.data[endX], i, 1);
-    //       }
-    //     } else {
-    //       for (let i = startX; i != endX; i += (startX > endX ? -1 : 1)) {
-    //         self.$set(self.data[i], endY, 1);
-    //       }
-    //     }
-    //   }
+      function drawline(endX, endY) {
+        if (!startX || !startY) {
+          startX = endX;
+          startY = endY;
+        }
+        if (startX == endX) {
+          for (let i = startY; i != endY; i += (startY > endY ? -1 : 1)) {
+            self.$set(self.data[endX], i, 1);
+          }
+          startX = endX;
+          startY = endY;
+          return
+        } else if (startY == endY) {
+          for (let i = startX; i != endX; i += (startX > endX ? -1 : 1)) {
+            self.$set(self.data[i], endY, 1);
+          }
+          startX = endX;
+          startY = endY;
+          return
+        }
+        console.log(startX, startY, endX, endY);
+        const XLen = Math.abs(endX - startX) + 1;
+        const YLen = Math.abs(endY - startY) + 1;
+        const rect = [];
+        const XDirect = startX < endX;
+        const YDirect = startY < endY;
+
+        if (XLen < YLen) {
+          let y = 1;
+          for (let j = 0; j < YLen; j++) {
+            const x = j * XLen / YLen;
+            if (x > y) {
+              rect.push([y, y * YLen / XLen]);
+              y++;
+              rect.push([x, j]);
+            } else {
+              rect.push([x, j]);
+            }
+          }
+        } else {
+          let x = 1;
+          for (let i = 0; i < XLen; i++) {
+            const y = i * YLen / XLen;
+            if (y > x) {
+              rect.push([x * XLen / YLen, x]);
+              x++;
+              rect.push([i, y]);
+            } else {
+              rect.push([i, y]);
+            }
+          }
+        }
+
+        self.$set(self.data[startX], startY, 1);
+        for (let i = 1; i < rect.length; i++) {
+          if ((rect[i][0] - rect[i - 1][0]) * (rect[i][1] - rect[i - 1][1]) >= 1 / 4) {
+            self.$set(self.data[Math.floor(rect[i][0]) * (XDirect ? 1 : -1) + startX], Math.floor(rect[i][1]) * (YDirect ? 1 : -1) + startY, 1);
+          }
+        }
+        self.$set(self.data[endX], endY, 1);
+        startX = endX;
+        startY = endY;
+      }
       const handleMouseover = (event) => {
         if (event.target.className == 'board-item') {
           const endX = parseInt(event.target.getAttribute('row'), 10);
           const endY = parseInt(event.target.getAttribute('col'), 10);
-          self.$set(this.data[endX], endY, 1);
-          if (endX == startX || startY == endY) {
-            // drawline(endX, endY)
-          }
-          startX = endX;
-          startY = endY;
+          drawline(endX, endY)
         }
       };
 
