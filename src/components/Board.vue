@@ -164,7 +164,7 @@ export default {
     .board{
         border:1px solid #eee;
         width: 160px;
-        margin: 50px 0 20px 120px;
+        margin: 0px 0 20px 120px;
         float: left;
     }
     .board-row{

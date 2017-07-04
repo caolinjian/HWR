@@ -81,7 +81,7 @@ h1 {
 
 h2 {
   font-size: 25px;
-  margin: 0 120px 20px;
+  margin: 20px 120px;
   text-align: left;
 }
 
