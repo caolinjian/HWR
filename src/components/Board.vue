@@ -1,11 +1,10 @@
 <template lang="html">
-    <div>
+    <div  class="clearfix">
         <div class="board" @mousedown="handleMousedown($event)">
             <div class="board-row" v-for="(boardRow, i) in data" >
                 <div class="board-item"  v-for="(boardItem, j) in boardRow" :row="i" :col="j" :style="{background:data[i][j]==0?'#fff':'#333'}"></div>
             </div>
         </div>
-        <canvas width="160" height="160" @mousedown="drawCanvas($event)"></canvas>
         <button @click="clear">clear</button>
         <button @click="send">send</button>
         <span>{{result}}</span>
@@ -43,14 +42,14 @@ export default {
         }
         if (startX == endX) {
           for (let i = startY; i != endY; i += (startY > endY ? -1 : 1)) {
-            self.$set(self.data[endX], i, 1);
+            self.setData(endX, i, 1);
           }
           startX = endX;
           startY = endY;
           return
         } else if (startY == endY) {
           for (let i = startX; i != endX; i += (startX > endX ? -1 : 1)) {
-            self.$set(self.data[i], endY, 1);
+            self.setData(i, endY, 1);
           }
           startX = endX;
           startY = endY;
@@ -88,13 +87,13 @@ export default {
           }
         }
 
-        self.$set(self.data[startX], startY, 1);
+        self.setData(startX, startY, 1);
         for (let i = 1; i < rect.length; i++) {
           if ((rect[i][0] - rect[i - 1][0]) * (rect[i][1] - rect[i - 1][1]) >= 1 / 4) {
-            self.$set(self.data[Math.floor(rect[i][0]) * (XDirect ? 1 : -1) + startX], Math.floor(rect[i][1]) * (YDirect ? 1 : -1) + startY, 1);
+            self.setData(self.data[Math.floor(rect[i][0]) * (XDirect ? 1 : -1) + startX], Math.floor(rect[i][1]) * (YDirect ? 1 : -1) + startY, 1);
           }
         }
-        self.$set(self.data[endX], endY, 1);
+        self.setData(endX, endY, 1);
         startX = endX;
         startY = endY;
       }
@@ -116,37 +115,19 @@ export default {
       $board.addEventListener('mouseup', handleMouseleaveOrMouseUp);
       $board.addEventListener('mouseleave', handleMouseleaveOrMouseUp);
     },
-    drawCanvas(ev) {
-      const canvas = document.querySelector('canvas');
-      const context = canvas.getContext('2d');
-      let startX;
-      let startY;
-      let endX;
-      let endY;
-      startX = ev.offsetX;
-      startY = ev.offsetY;
-      const handleMouseover = function(e) {
-        endX = e.offsetX;
-        endY = e.offsetY;
-        context.beginPath()
-        context.moveTo(startX, startY);
-        context.lineTo(endX, endY);
-        context.lineWidth = 3;
-        context.strokeStyle = '#000';
-        context.stroke();
-        context.closePath()
-        startX = endX;
-        startY = endY;
+    setData(x, y) {
+      // 加粗 3倍
+      for (let i = x - 1; i <= x + 1; i++) {
+        if (i >= 0 && i < 32) {
+          for (let j = y - 1; j <= y + 1; j++) {
+            if (j >= 0 && j < 32) {
+              this.$set(this.data[i], j, 1);
+            }
+          }
+        }
       }
-      const handleMouseleaveOrMouseUp = () => {
-        canvas.removeEventListener('mousemove', handleMouseover);
-        canvas.removeEventListener('mouseup', handleMouseleaveOrMouseUp);
-        canvas.removeEventListener('mouseleave', handleMouseleaveOrMouseUp);
-      };
-      canvas.addEventListener('mousemove', handleMouseover);
-      canvas.addEventListener('mouseup', handleMouseleaveOrMouseUp);
-      canvas.addEventListener('mouseleave', handleMouseleaveOrMouseUp);
     },
+
     clear() {
       this.data = getDefaultData();
       const canvas = document.querySelector('canvas');
@@ -155,6 +136,7 @@ export default {
     },
     send() {
       const self = this;
+      self.result = 'Reckoning...'
       window.fetch('/recognition', {
         method: 'post',
         headers: {
@@ -169,7 +151,7 @@ export default {
         }
         throw new Error('Network response was not ok.');
       }).then((json) => {
-        console.log('---line---', json);
+        self.result = json.test
       }).catch((error) => {
         console.log(`There has been a problem with your fetch operation:  ${error.message}`);
       });

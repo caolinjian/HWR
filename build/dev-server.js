@@ -19,7 +19,7 @@ var proxyTable = config.dev.proxyTable
 var app = express();
 app.post('/recognition',function(req,res){
     console.log(req.params);
-    return res.json({ok:1})
+    return res.json({test:1})
 })
 var compiler = webpack(webpackConfig)
 
