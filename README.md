@@ -1,8 +1,8 @@
-# rubik-cube
+# HandWriting Recognition
 
 > A Vue.js project
 
-## Build Setup
+## Build HTML JS
 
 ``` bash
 # install dependencies
@@ -15,9 +15,18 @@ npm run dev
 npm run build
 
 ```
+## Run python
+
+``` bash
+# install dependencies
+pip install flask,numpy
+
+# serve with hot reload at localhost:5000
+python flaskr
+
+```
+
+
 todo:
-    hover到每个面时显示4个方面的按钮
-    兼容手机端
-    自动重置
-    优化动画
-    优化页面
+    添加其他识别方法
+    前端展示识别的code
