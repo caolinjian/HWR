@@ -176,26 +176,28 @@ class BPNeuralNetwork:
                 error += self.back_propagate(case, label, learn, correct)
 
     def test(self):
-        savefile = "bpnn10000.json"
-        if os.path.exists(savefile) == False:
-            cases = []
-            labels = []
-            trainingFileList = os.listdir('trainingDigits')
-            m = len(trainingFileList)
-            for i in range(m):
-                fileNameStr = trainingFileList[i]
-                fileStr = fileNameStr.split('.')[0]     #take off .txt
-                classNumStr = int(fileStr.split('_')[0])
-                labels.append(num2vector(int(classNumStr), 10))
-                cases.append(img2vector('trainingDigits/%s' % fileNameStr))
+        savefile = "bpnn-save/1023-100-10-100.json"
+        cases = []
+        labels = []
+        trainingFileList = os.listdir('testDigits')
+        m = len(trainingFileList)
+        for i in range(m):
+            fileNameStr = trainingFileList[i]
+            fileStr = fileNameStr.split('.')[0]     #take off .txt
+            classNumStr = int(fileStr.split('_')[0])
+            labels.append(num2vector(int(classNumStr), 10))
+            cases.append(img2vector('testDigits/%s' % fileNameStr))
 
-            self.setup(1023, 5, 10)
-            self.train(cases, labels, 10000, 0.05, 0.1)
-            for case in cases:
-                print(self.predict(case))
+        if os.path.exists(savefile) == False:
+            self.setup(1023, 100, 10)
+            self.train(cases, labels, 100, 0.05, 0.1)
             self.save(savefile)
         else :
             self.load(savefile)
+
+        for i in range(len(cases)):
+            print("input: ", vector2num(labels[i]))
+            print("output: ", vector2num(self.predict(cases[i])))
 
 nn = BPNeuralNetwork()
 nn.test()
