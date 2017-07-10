@@ -199,6 +199,7 @@ class BPNeuralNetwork:
             print("input: ", vector2num(labels[i]))
             print("output: ", vector2num(self.predict(cases[i])))
 
+
 nn = BPNeuralNetwork()
 nn.test()
 
@@ -224,3 +225,4 @@ def index():
 
 if __name__ == '__main__':
     app.run()
+
