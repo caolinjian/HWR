@@ -15,7 +15,7 @@ npm run dev
 npm run build
 
 ```
-## Run python
+## Run python2.7
 
 ``` bash
 # install dependencies
